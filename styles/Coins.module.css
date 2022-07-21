@@ -1,0 +1,28 @@
+.coin_item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+}
+.coin_item_head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.coin_item_head img {
+    width: 24px;
+    height: 24px;
+}
+
+.coin_item_stats {
+    display: flex;
+    justify-content: flex-end;
+    gap: 32px;
+    flex: 1 0 auto;
+    text-align: right;
+}
+
+.coin_item_stats > * {
+    flex: 0 0 120px;
+}
