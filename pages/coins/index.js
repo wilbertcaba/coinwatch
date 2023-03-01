@@ -1,8 +1,10 @@
 import Axios from 'axios';
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { LineChart, Line, Tooltip, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { StarIcon } from '@heroicons/react/24/outline';
 
-const CoinList = ({ coinData }) => {
+const CoinList = ({ coinData, coin24Hours }) => {
     // console.log(coinData);
 
     const styleGreen = {
@@ -14,45 +16,31 @@ const CoinList = ({ coinData }) => {
     };
 
     useEffect(() => {
-        console.log(coinData);
-        // console.log(priceSevenDays(2));
-        // console.log(coinSevenDays);
+        // console.log(coinData);
+
+        // This is an intent to get the 24 hour price of each coin
+        // const coinsIds = coinData.map((coin) => {return coin.id});
+        // const coin24Hours = async () => {
+        //     try {
+        //         const response = await Promise.all(
+        //             coinsIds.map((id) => {
+        //                 return Axios.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1`);
+        //             })
+        //         );
+        //         return response;
+        //         console.log(response.data)
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // }
+
+        // console.log(coin24Hours);
+
     });
-
-    const priceSevenDays = (index) => {
-
-        return coinData[index].sparkline_in_7d.price;
-        // const data = coinData[index].sparkline_in_7d.price;
-
-        // return data.map( (price) => {
-        //     return {
-        //         value: price
-        //     }
-        // });
-
-
-
-        // return coinData[index].sparkline_in_7d.price.map((price,index) => {
-        //     // const readablePrice = price.toLocaleString();
-        //     return {
-        //         price: price
-        //     }
-        // });
-    }
-
-
-
-    // const priceSevenDays = coinData[1].sparkline_in_7d.price.map((price,index) => {
-    //     // const readablePrice = price.toLocaleString();
-    //     return {
-    //         price: price
-    //     }
-    // });
-
-    // const logPrice = setTimeout(() => { priceSevenDays(1) }, '2000');
 
     console.log('==========================');
     // console.log(logPrice);
+
 
     const DATA_24_HOURS = [
         { time: '00:00', price: 48000 },
@@ -87,39 +75,35 @@ const CoinList = ({ coinData }) => {
 
     return (
         <>
-            <div className='relative basis-28 h-60'>
-                <ResponsiveContainer>
-                    <LineChart data={DATA_24_HOURS} width={600} height={300} dot={false}>
-                        <XAxis dataKey="time"  />
-                        <YAxis dataKey="price" domain={Ydomain}/>
-                        <Line r={0} type="linear" dataKey="price" stroke="#8884d8" />
-                        <Tooltip />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
-
             <ul className='pt-10'>
-                {coinData.map((coin, index) => {
+                {coinData.map((coin) => {
                     return (
-                        <li key={coin.id} className='flex items-center justify-between hover:bg-slate-100 rounded py-2 px-4'>
-                            <div className='flex items-center gap-4'>
-                                <img src={coin.image} alt={`${coin.name} Logo`} className='w-7'/>
-                                <h3 className='text-md font-bold'>{coin.name}</h3>
-                                <p className='text-sm text-slate-500'>{coin.symbol}</p>
-                            </div>
-                            <div className='flex gap-4 justify-end grow basis-auto text-right text-base'>
-                                <div className='relative basis-28 h-5 flex justify-end'>
-                                    <LineChart width={100} height={30} data={DATA_24_HOURS}>
-                                        <XAxis dataKey="time"  hide={true} />
-                                        <YAxis dataKey="price" domain={Ydomain} hide={true}/>
-                                        <Line dot={false} type="linear" dataKey="price" stroke="#8884d8" />
-                                        {/* <Line dot={false}  dataKey="price" stroke="#8884d8" /> */}
-                                        <Tooltip />
-                                        <ResponsiveContainer />
-                                    </LineChart>
-                                </div>
-                                <p className='basis-28'>{coin.current_price.toLocaleString()}</p>
-                                <p className='basis-28' style={coin.price_change_percentage_24h > 0 ? styleGreen : styleRed} >{coin.price_change_percentage_24h.toFixed(2)}%</p>
+                        <li key={coin.id}>
+                            <div className='flex items-center justify-between hover:bg-slate-100 rounded-md py-2 px-4 gap-4'>
+                                <Link href={`coins/${coin.id}`}>
+                                    <div className='flex items-center justify-between flex-grow cursor-pointer'>
+                                        <div className='flex items-center gap-4'>
+                                            <img src={coin.image} alt={`${coin.name} Logo`} className='w-7'/>
+                                            <h3 className='text-md font-bold'>{coin.name}</h3>
+                                            <p className='text-sm text-slate-500'>{coin.symbol}</p>
+                                        </div>
+                                        <div className='flex gap-4 justify-end grow basis-auto text-right text-base'>
+                                            <div className='relative basis-28 h-5 flex justify-end'>
+                                                <LineChart width={100} height={30} data={DATA_24_HOURS}>
+                                                    <XAxis dataKey="time"  hide={true} />
+                                                    <YAxis dataKey="price" domain={Ydomain} hide={true}/>
+                                                    <Line dot={false} type="linear" dataKey="price" stroke="#8884d8" />
+                                                    <ResponsiveContainer />
+                                                </LineChart>
+                                            </div>
+                                            <p className='basis-28'>{coin.current_price.toLocaleString()}</p>
+                                            <p className='basis-28' style={coin.price_change_percentage_24h > 0 ? styleGreen : styleRed} >{coin.price_change_percentage_24h.toFixed(2)}%</p>
+                                        </div>
+                                    </div>
+                                </Link>
+                                <button>
+                                    <StarIcon className='w-6'/>
+                                </button>
                             </div>
                         </li>
                     );
@@ -144,13 +128,20 @@ const CoinList = ({ coinData }) => {
 export const getServerSideProps = async () => {
     // const data = await Axios.get('https://api.coinstats.app/public/v1/coins?skip=0');
     const data = await Axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C30d%2C1y');
-    // const coinsIds = data.data.map((coin) => {return coin.id});
     // const coinsIdsString = coinsIds.join(',');
     // const dataSevenDays = await Axios.get(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinsIdsString}&days=7`);
 
+    // const coinsIds = data.data.map((coin) => {return coin.id});
+    // const coin24Hours = await Promise.all(
+    //     coinsIds.map((id) => {
+    //         return Axios.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=1`);
+    //     })
+    // );
+
     return {
         props: {
-            coinData: data.data
+            coinData: data.data,
+            // coin24Hours: coin24Hours.data
             // coinSevenDays: coinsIdsString
         }
     }
